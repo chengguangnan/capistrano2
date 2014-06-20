@@ -54,7 +54,7 @@ namespace :deploy do
       specify additional environment variables to pass to rake via the \
       asset_env variable. The defaults are:
 
-        set :rake,      "rake"
+        set :rake,      "bundle exec rake"
         set :rails_env, "production"
         set :asset_env, "RAILS_GROUPS=assets"
     DESC
