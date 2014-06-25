@@ -61,7 +61,7 @@ namespace :deploy do
     task :precompile, :roles => lambda { assets_role }, :except => { :no_release => true } do
       run <<-CMD.compact
         cd -- #{latest_release} && 
-        RAILS_ENV=#{rails_env.to_s.shellescape} #{asset_env} #{rake} assets:precompile
+        RAILS_ENV=#{rails_env.to_s.shellescape} #{asset_env} #{fetch(:rake)} assets:precompile
       CMD
 
       if capture("ls -1 #{shared_path.shellescape}/#{shared_assets_prefix}/manifest* | wc -l").to_i > 1
@@ -114,7 +114,7 @@ namespace :deploy do
         set :asset_env, "RAILS_GROUPS=assets"
     DESC
     task :clean, :roles => lambda { assets_role }, :except => { :no_release => true } do
-      run "cd #{latest_release} && #{rake} RAILS_ENV=#{rails_env} #{asset_env} assets:clean"
+      run "cd #{latest_release} && #{fetch(:rake)} RAILS_ENV=#{rails_env} #{asset_env} assets:clean"
     end
 
     desc <<-DESC
@@ -193,7 +193,7 @@ namespace :deploy do
         run <<-CMD.compact
           cd -- #{previous_release.shellescape} &&
           cp -f -- #{previous_manifest.shellescape} #{restored_manifest_path.shellescape} &&
-          [ -z "$(#{rake} -P | grep assets:precompile:nondigest)" ] || #{rake} RAILS_ENV=#{rails_env.to_s.shellescape} #{asset_env} assets:precompile:nondigest
+          [ -z "$(#{fetch(:rake)} -P | grep assets:precompile:nondigest)" ] || #{fetch(:rake)} RAILS_ENV=#{rails_env.to_s.shellescape} #{asset_env} assets:precompile:nondigest
         CMD
       end
     end
