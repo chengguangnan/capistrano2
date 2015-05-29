@@ -17,7 +17,7 @@ after  'deploy:cleanup',           'deploy:assets:clean_expired'
 after  'deploy:rollback:revision', 'deploy:assets:rollback'
 
 def shared_manifest_path
-  @shared_manifest_path ||= capture("ls #{shared_path.shellescape}/#{shared_assets_prefix}/manifest*").strip
+  @shared_manifest_path ||= capture("ls #{shared_path.shellescape}/#{shared_assets_prefix}/.sprockets-manifest*").strip
 end
 
 # Parses manifest and returns array of uncompressed and compressed asset filenames with and without digests
@@ -66,13 +66,6 @@ namespace :deploy do
 
       if capture("ls -1 #{shared_path.shellescape}/#{shared_assets_prefix}/manifest* | wc -l").to_i > 1
         raise "More than one asset manifest file was found in '#{shared_path.shellescape}/#{shared_assets_prefix}'.  If you are upgrading a Rails 3 application to Rails 4, follow these instructions: http://github.com/capistrano/capistrano/wiki/Upgrading-to-Rails-4#asset-pipeline"
-      end
-
-      # Sync manifest filenames across servers if our manifest has a random filename
-      if shared_manifest_path =~ /manifest-.+\./
-        run <<-CMD.compact
-          [ -e #{shared_manifest_path.shellescape} ] || mv -- #{shared_path.shellescape}/#{shared_assets_prefix}/manifest* #{shared_manifest_path.shellescape}
-        CMD
       end
 
       # Copy manifest to release root (for clean_expired task)
